@@ -9,12 +9,10 @@ import simulation.map.SimulationMap;
 
 public class MoveRobot implements Command {
 
-    private static final String ERR_NOT_STARTED =
-            "ERROR: Simulation not started. Cannot perform action";
-    private static final String ERR_NO_BATTERY =
-            "ERROR: Not enough battery left. Cannot perform action";
-    private static final String SUCCESS_MSG =
-            "The robot has successfully moved to position (%d, %d).";
+    private static final String ERR_NOT_STARTED = "ERROR: Simulation not started. Cannot perform action";
+    private static final String ERR_NO_BATTERY = "ERROR: Not enough battery left. Cannot perform action";
+    private static final String ERR_STILL_CHARGING = "ERROR: Robot still charging. Cannot perform action";
+    private static final String SUCCESS_MSG = "The robot has successfully moved to position (%d, %d).";
 
     @Override
     public void execute(CommanContext ctx) {
@@ -30,11 +28,16 @@ public class MoveRobot implements Command {
         SimulationMap map = sim.getMap();
         Coordinates currentPos = robot.getPosition();
 
+        if (robot.isCharging(ctx.getCommandInput().getTimestamp())) {
+            result.put("message", ERR_STILL_CHARGING);
+            return;
+        }
+
         int[][] directions = {
                 {0, 1},  // Jos
                 {1, 0},  // Dreapta
                 {0, -1}, // Sus
-                {-1, 0}  // Stânga
+                {-1, 0}  // Stanga
         };
 
         int bestX = -1;

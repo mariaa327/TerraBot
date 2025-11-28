@@ -6,6 +6,8 @@ public class TerraBot {
     private Coordinates position;
     private int energy;
 
+    private int busyUntil = -1;
+
     public TerraBot(Coordinates startPosition, int startEnergy) {
         this.position = startPosition;
         this.energy = startEnergy;
@@ -29,5 +31,16 @@ public class TerraBot {
 
     public void consumeEnergy(int amount) {
         this.energy -= amount;
+    }
+
+    public void recharge(int amount, int currentTimestamp) {
+        this.energy += amount;
+        this.busyUntil = currentTimestamp + amount;
+    }
+
+    public boolean isCharging(int currentTimestamp) {
+        if (busyUntil == -1)
+            return false;
+        return currentTimestamp < busyUntil;
     }
 }

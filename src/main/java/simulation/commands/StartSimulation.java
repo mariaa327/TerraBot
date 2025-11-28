@@ -20,19 +20,16 @@ public class StartSimulation implements Command {
         ObjectNode result = ctx.getResultNode();
 
         if (ctx.isSimulationStarted()) {
-            result.put("message",
-                    "ERROR: Simulation already started. Cannot perform action");
+            result.put("message", "ERROR: Simulation already started. Cannot perform action");
             return;
         }
 
         if (ctx.getCurrentSimulationIndex() >= ctx.getSimulations().size()) {
-            result.put("message",
-                    "ERROR: No simulation available. Cannot perform action");
+            result.put("message", "ERROR: No simulation available. Cannot perform action");
             return;
         }
 
-        SimulationInput simInput =
-                ctx.getSimulations().get(ctx.getCurrentSimulationIndex());
+        SimulationInput simInput = ctx.getSimulations().get(ctx.getCurrentSimulationIndex());
 
         Simulation simulation = buildSimulation(simInput);
 

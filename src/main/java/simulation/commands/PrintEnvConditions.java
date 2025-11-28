@@ -10,11 +10,12 @@ import simulation.entities.soil.*;
 import simulation.entities.water.Water;
 import simulation.map.Coordinates;
 import simulation.map.MapCell;
+import simulation.core.TerraBot;
 
 public class PrintEnvConditions implements Command {
 
-    private static final String ERR_NOT_STARTED =
-            "ERROR: Simulation not started. Cannot perform action";
+    private static final String ERR_NOT_STARTED = "ERROR: Simulation not started. Cannot perform action";
+    private static final String ERR_STILL_CHARGING = "ERROR: Robot still charging. Cannot perform action";
 
     @Override
     public void execute(CommanContext ctx) {
@@ -27,6 +28,13 @@ public class PrintEnvConditions implements Command {
         }
 
         Simulation sim = ctx.getSimulation();
+        TerraBot robot = sim.getBot();
+
+        if (robot.isCharging(ctx.getCommandInput().getTimestamp())) {
+            result.put("message", ERR_STILL_CHARGING);
+            return;
+        }
+
         Coordinates pos = sim.getBot().getPosition();
         MapCell cell = sim.getMap().getCell(pos);
 
@@ -44,7 +52,6 @@ public class PrintEnvConditions implements Command {
             s.put("organicMatter", soil.getOrganicMatter());
             s.put("soilQuality", soil.getSoilQuality());
 
-            // fără instanceof / getClass – folosim type string
             String soilType = soil.getType();
             if ("ForestSoil".equals(soilType)) {
                 ForestSoil fs = (ForestSoil) soil;
@@ -75,7 +82,6 @@ public class PrintEnvConditions implements Command {
             out.set("plants", p);
         }
 
-        // ---------------- ANIMAL ----------------
         Animal animal = cell.getAnimal();
         if (animal != null) {
             ObjectNode a = mapper.createObjectNode();
@@ -105,7 +111,6 @@ public class PrintEnvConditions implements Command {
             a.put("oxygenLevel", air.getOxygenLevel());
             a.put("airQuality", air.getAirQuality());
 
-            // din nou, fără instanceof / getClass, doar pe type string + cast
             String airType = air.getType();
             if ("TropicalAir".equals(airType)) {
                 TropicalAir ta = (TropicalAir) air;

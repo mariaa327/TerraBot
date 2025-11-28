@@ -64,7 +64,12 @@ public class SimRunner {
                 case "moveRobot":
                     command = new MoveRobot();
                     break;
-
+                case "getEnergyStatus":
+                    command = new GetEnergyStatus();
+                    break;
+                case "rechargeBattery":
+                    command = new RechargeBattery();
+                    break;
                 default:
                     result.put("message",
                             "ERROR: Simulation not started. Cannot perform action");
