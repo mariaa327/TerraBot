@@ -4,9 +4,9 @@ import simulation.entities.Entity;
 
 public abstract class Soil extends Entity {
     private final double nitrogen;
-    private final double waterRetention;
+    private double waterRetention;
     private final double soilPH;
-    private final double organicMatter;
+    private double organicMatter;
 
     private Double quality;
 
@@ -38,6 +38,14 @@ public abstract class Soil extends Entity {
 
     public double getOrganicMatter() {
         return organicMatter;
+    }
+
+    public void setOrganicMatter(double organicMatter) {
+        this.organicMatter = organicMatter;
+    }
+
+    public void setWaterRetention(double waterRetention) {
+        this.waterRetention = waterRetention;
     }
 
     protected abstract double rawScore();

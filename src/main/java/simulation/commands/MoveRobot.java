@@ -28,6 +28,8 @@ public class MoveRobot implements Command {
         SimulationMap map = sim.getMap();
         Coordinates currentPos = robot.getPosition();
 
+        int currentTimestamp = ctx.getCommandInput().getTimestamp();
+
         if (robot.isCharging(ctx.getCommandInput().getTimestamp())) {
             result.put("message", ERR_STILL_CHARGING);
             return;
@@ -54,7 +56,7 @@ public class MoveRobot implements Command {
             if (isValid(nextX, nextY, map)) {
                 MapCell cell = map.getCell(nextX, nextY);
 
-                int currentScore = calculateSafetyScore(cell);
+                int currentScore = calculateSafetyScore(cell, currentTimestamp);
 
                 if (currentScore < bestScore) {
                     bestScore = currentScore;
@@ -82,9 +84,9 @@ public class MoveRobot implements Command {
         return x >= 0 && x < map.getWidth() && y >= 0 && y < map.getHeight();
     }
 
-    private int calculateSafetyScore(MapCell cell) {
+    private int calculateSafetyScore(MapCell cell, int currentTimestamp) {
         double soilRisk = cell.getSoil().getStuckProbability();
-        double airRisk = cell.getAir().getDamageProbability();
+        double airRisk = cell.getAir().getDamageProbability(currentTimestamp);
 
         double sum = soilRisk + airRisk;
         double count = 2.0;

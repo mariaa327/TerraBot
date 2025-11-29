@@ -30,6 +30,7 @@ public class SimRunner {
     }
 
     public void run() {
+
         for (CommandInput cmd : commands) {
             ObjectNode result = mapper.createObjectNode();
             result.put("command", cmd.getCommand());
@@ -60,7 +61,6 @@ public class SimRunner {
                 case "printMap":
                     command = new PrintMap();
                     break;
-
                 case "moveRobot":
                     command = new MoveRobot();
                     break;
@@ -69,6 +69,9 @@ public class SimRunner {
                     break;
                 case "rechargeBattery":
                     command = new RechargeBattery();
+                    break;
+                case "changeWeatherConditions":
+                    command = new ChangeWeatherConditions();
                     break;
                 default:
                     result.put("message",

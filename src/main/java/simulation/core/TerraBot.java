@@ -1,16 +1,29 @@
 package simulation.core;
 
+import simulation.entities.Entity;
 import simulation.map.Coordinates;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class TerraBot {
     private Coordinates position;
     private int energy;
+
+    // Inventar și Memorie
+    private List<Entity> inventory;
+    private Set<Coordinates> visited;
 
     private int busyUntil = -1;
 
     public TerraBot(Coordinates startPosition, int startEnergy) {
         this.position = startPosition;
         this.energy = startEnergy;
+        this.inventory = new ArrayList<>();
+        this.visited = new HashSet<>();
+        // Marcăm startul ca vizitat
+        this.visited.add(startPosition);
     }
 
     public Coordinates getPosition() {
@@ -19,6 +32,7 @@ public class TerraBot {
 
     public void setPosition(Coordinates position) {
         this.position = position;
+        this.visited.add(position); // Ținem minte pe unde mergem
     }
 
     public int getEnergy() {
@@ -43,4 +57,13 @@ public class TerraBot {
             return false;
         return currentTimestamp < busyUntil;
     }
+
+    public void addScannedEntity(Entity entity) {
+        this.inventory.add(entity);
+    }
+
+    public List<Entity> getInventory() {
+        return inventory;
+    }
+
 }

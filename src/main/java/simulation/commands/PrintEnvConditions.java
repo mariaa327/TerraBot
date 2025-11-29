@@ -100,6 +100,8 @@ public class PrintEnvConditions implements Command {
             out.set("water", w);
         }
 
+        int currentTimestamp = ctx.getCommandInput().getTimestamp();
+
         Air air = cell.getAir();
         if (air != null) {
             ObjectNode a = mapper.createObjectNode();
@@ -109,8 +111,9 @@ public class PrintEnvConditions implements Command {
             a.put("humidity", air.getHumidity());
             a.put("temperature", air.getTemperature());
             a.put("oxygenLevel", air.getOxygenLevel());
-            a.put("airQuality", air.getAirQuality());
+            //a.put("airQuality", air.getAirQuality());
 
+            a.put("airQuality", air.getAirQuality(currentTimestamp));
             String airType = air.getType();
             if ("TropicalAir".equals(airType)) {
                 TropicalAir ta = (TropicalAir) air;
@@ -122,7 +125,8 @@ public class PrintEnvConditions implements Command {
                 a.put("pollenLevel", tmp.getPollenLevel());
             } else if ("DesertAir".equals(airType)) {
                 DesertAir da = (DesertAir) air;
-                a.put("dustParticles", da.getDustParticles());
+                //a.put("dustParticles", da.getDustParticles());
+                a.put("desertStorm", da.isDesertStormActive(currentTimestamp));
             } else if ("PolarAir".equals(airType)) {
                 PolarAir pa = (PolarAir) air;
                 a.put("iceCrystalConcentration", pa.getIceCrystalConcentration());

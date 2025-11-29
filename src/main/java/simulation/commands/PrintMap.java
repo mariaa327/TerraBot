@@ -24,6 +24,8 @@ public class PrintMap implements Command {
             return;
         }
 
+        int currentTimestamp = ctx.getCommandInput().getTimestamp();
+
         TerraBot robot = ctx.getSimulation().getBot();
         if (robot.isCharging(ctx.getCommandInput().getTimestamp())) {
             result.put("message", "ERROR: Robot still charging. Cannot perform action");
@@ -51,7 +53,7 @@ public class PrintMap implements Command {
                 Air air = cell.getAir();
                 Soil soil = cell.getSoil();
 
-                String airQuality = (air != null) ? air.getQualityCategory() : "poor";
+                String airQuality = (air != null) ? air.getQualityCategory(currentTimestamp) : "poor";
                 String soilQuality = (soil != null) ? soil.getQualityCategory() : "poor";
 
                 cellNode.put("airQuality", airQuality);

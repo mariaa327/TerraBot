@@ -20,9 +20,7 @@ public final class TundraSoil extends Soil {
 
     @Override
     protected double rawScore() {
-        return getNitrogen() * 0.7
-                + getOrganicMatter() * 0.5
-                - permafrostDepth * 1.5;
+        return getNitrogen() * 0.7 + getOrganicMatter() * 0.5 - permafrostDepth * 1.5;
     }
 
     @Override

@@ -20,9 +20,7 @@ public final class DesertSoil extends Soil {
 
     @Override
     protected double rawScore() {
-        return getNitrogen() * 0.5
-                + getWaterRetention() * 0.3
-                - salinity * 2;
+        return getNitrogen() * 0.5 + getWaterRetention() * 0.3 - salinity * 2;
     }
 
     @Override

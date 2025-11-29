@@ -9,4 +9,5 @@ public final class FloweringPlant extends Plant {
     protected double getBaseStuckPossibility() {
         return 90.0;
     }
+
 }

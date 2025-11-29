@@ -9,4 +9,5 @@ public final class GymnospermPlant extends Plant {
     protected double getBaseStuckPossibility() {
         return 60.0;
     }
+
 }

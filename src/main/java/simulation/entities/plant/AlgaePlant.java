@@ -9,4 +9,5 @@ public final class AlgaePlant extends Plant {
     protected double getBaseStuckPossibility() {
         return 20.0;
     }
+
 }

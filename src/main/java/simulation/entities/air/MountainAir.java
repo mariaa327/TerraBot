@@ -19,12 +19,24 @@ public final class MountainAir extends Air {
 
     @Override
     protected double getMaxQualityScore() {
-        return 78.0; // [cite: 348]
+        return 78.0;
     }
 
     @Override
     protected double rawScore() {
         double oxygenFactor = getOxygenLevel() - (altitude / 1000.0 * 0.5);
         return oxygenFactor * 2 + getHumidity() * 0.6;
+    }
+
+    @Override
+    protected double applyWeatherModifier(double baseScore) {
+        if (activeWeatherType != null) {
+            if (activeWeatherType.equals("peopleHiking")) {
+                double penalty = weatherVal * 0.1;
+                double newScore = baseScore - penalty;
+                return newScore;
+            }
+        }
+        return baseScore;
     }
 }

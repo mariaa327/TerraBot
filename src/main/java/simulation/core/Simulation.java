@@ -1,16 +1,16 @@
 package simulation.core;
 
+import simulation.entities.air.Air;
+import simulation.entities.animal.Animal;
+import simulation.entities.plant.Plant;
+import simulation.entities.soil.Soil;
+import simulation.entities.water.Water;
+import simulation.map.MapCell;
 import simulation.map.SimulationMap;
 
-/**
- * Simple wrapper tying together the map and the robot.
- * Later we’ll add clock, updaters etc., but tests 1–2
- * only need map + current robot position.
- */
 public class Simulation {
     private final SimulationMap map;
     private final TerraBot bot;
-
     private boolean running;
 
     public Simulation(SimulationMap map, TerraBot bot) {
@@ -34,4 +34,5 @@ public class Simulation {
     public void setRunning(boolean running) {
         this.running = running;
     }
+
 }

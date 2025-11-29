@@ -19,11 +19,23 @@ public final class PolarAir extends Air {
 
     @Override
     protected double getMaxQualityScore() {
-        return 142.0; // [cite: 345]
+        return 142.0;
     }
 
     @Override
     protected double rawScore() {
-        return getOxygenLevel() * 2 + (100 - Math.abs(getTemperature())) - iceCrystalConcentration * 0.05;
+        double absTemp = Math.abs(getTemperature());
+        return getOxygenLevel() * 2 + (100 - absTemp) - iceCrystalConcentration * 0.05;
+    }
+
+    @Override
+    protected double applyWeatherModifier(double baseScore) {
+        if (activeWeatherType != null) {
+            if (activeWeatherType.equals("polarStorm")) {
+                double penalty = weatherVal * 0.2;
+                return baseScore - penalty;
+            }
+        }
+        return baseScore;
     }
 }

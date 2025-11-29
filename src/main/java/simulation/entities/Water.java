@@ -51,4 +51,5 @@ public class Water extends Entity {
     public boolean isFrozen() {
         return frozen;
     }
+
 }

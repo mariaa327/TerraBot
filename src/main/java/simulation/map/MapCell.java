@@ -53,9 +53,6 @@ public class MapCell {
         this.water = water;
     }
 
-    /**
-     * Number of optional objects: plant, animal, water.
-     */
     public int getOptionalObjectsCount() {
         int c = 0;
         if (plant != null) c++;

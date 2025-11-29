@@ -24,8 +24,16 @@ public final class TropicalAir extends Air {
 
     @Override
     protected double rawScore() {
-        return getOxygenLevel() * 2
-                + getHumidity() * 0.5
-                - co2Level * 0.01;
+        return getOxygenLevel() * 2 + getHumidity() * 0.5 - co2Level * 0.01;
+    }
+
+    @Override
+    protected double applyWeatherModifier(double baseScore) {
+        if (activeWeatherType != null) {
+            if (activeWeatherType.equals("rainfall")) {
+                return baseScore + weatherVal * 0.3;
+            }
+        }
+        return baseScore;
     }
 }

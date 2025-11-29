@@ -26,4 +26,17 @@ public final class TemperateAir extends Air {
     protected double rawScore() {
         return getOxygenLevel() * 2 + getHumidity() * 0.7 - pollenLevel * 0.1;
     }
+    @Override
+    protected double applyWeatherModifier(double baseScore) {
+        if (activeWeatherType != null && activeWeatherType.equals("newSeason")) {
+            int penalty = 0;
+            if (weatherSeason != null) {
+                if (weatherSeason.equalsIgnoreCase("Spring")) {
+                    penalty = 15;
+                }
+            }
+            return baseScore - penalty;
+        }
+        return baseScore;
+    }
 }

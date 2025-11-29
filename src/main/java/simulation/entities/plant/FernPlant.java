@@ -9,4 +9,5 @@ public final class FernPlant extends Plant {
     protected double getBaseStuckPossibility() {
         return 30.0;
     }
+
 }

@@ -20,9 +20,7 @@ public final class SwampSoil extends Soil {
 
     @Override
     protected double rawScore() {
-        return getNitrogen() * 1.1
-                + getOrganicMatter() * 2.2
-                - waterLogging * 5;
+        return getNitrogen() * 1.1 + getOrganicMatter() * 2.2 - waterLogging * 5;
     }
 
     @Override

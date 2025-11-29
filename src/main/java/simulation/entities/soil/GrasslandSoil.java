@@ -20,9 +20,7 @@ public final class GrasslandSoil extends Soil {
 
     @Override
     protected double rawScore() {
-        return getNitrogen() * 1.3
-                + getOrganicMatter() * 1.5
-                + rootDensity * 0.8;
+        return getNitrogen() * 1.3 + getOrganicMatter() * 1.5 + rootDensity * 0.8;
     }
 
     @Override
