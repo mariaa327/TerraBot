@@ -87,6 +87,12 @@ public class SimRunner {
                 case "scanObject":
                     command = new ScanObject();
                     break;
+                case "learnFact":
+                    command = new LearnFact();
+                    break;
+                case "printKnowledgeBase":
+                    command = new PrintKnowledgeBase();
+                    break;
                 default:
                     result.put("message", "ERROR: Simulation not started. Cannot perform action");
             }

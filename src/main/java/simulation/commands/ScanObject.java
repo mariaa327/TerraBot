@@ -84,6 +84,7 @@ public class ScanObject implements Command {
 
         if (entityToScan != null) {
             entityToScan.scan();
+            robot.addScannedEntity(entityToScan);
             robot.consumeEnergy(SCAN_COST);
             result.put("message", "The scanned object is " + messageType + ".");
         } else {

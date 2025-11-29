@@ -7,12 +7,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+
 public class TerraBot {
     private Coordinates position;
     private int energy;
 
     private List<Entity> inventory;
     private Set<Coordinates> visited;
+    private List<ScientificTopic> knowledgeBase;
 
     private int busyUntil = -1;
 
@@ -22,6 +24,7 @@ public class TerraBot {
         this.inventory = new ArrayList<>();
         this.visited = new HashSet<>();
         this.visited.add(startPosition);
+        this.knowledgeBase = new ArrayList<>();
     }
 
     public Coordinates getPosition() {
@@ -59,4 +62,37 @@ public class TerraBot {
         return false;
     }
 
+    public List<Entity> getInventory() {
+        return inventory;
+    }
+
+    public boolean hasScannedEntity(String name) {
+        for (ScientificTopic topic : knowledgeBase) {
+            if (topic.getName().equals(name)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void addScannedEntity(Entity entity) {
+        this.inventory.add(entity);
+
+        if (!hasScannedEntity(entity.getName())) {
+            this.knowledgeBase.add(new ScientificTopic(entity.getName()));
+        }
+    }
+
+    public void addFact(String entityName, String fact) {
+        for (ScientificTopic topic : knowledgeBase) {
+            if (topic.getName().equals(entityName)) {
+                topic.addFact(fact);
+                return;
+            }
+        }
+    }
+
+    public List<ScientificTopic> getKnowledgeBase() {
+        return knowledgeBase;
+    }
 }
