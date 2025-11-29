@@ -88,8 +88,7 @@ public class SimRunner {
                     command = new ScanObject();
                     break;
                 default:
-                    result.put("message",
-                            "ERROR: Simulation not started. Cannot perform action");
+                    result.put("message", "ERROR: Simulation not started. Cannot perform action");
             }
 
             if (command != null) {

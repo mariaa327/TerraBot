@@ -10,6 +10,8 @@ public class Water extends Entity {
     private final double pH;
     private final boolean frozen;
 
+    private int tickCount = 0;
+
     public Water(String type, String name, double mass, double purity, double salinity, double turbidity,
                  double contaminantIndex, double pH, boolean frozen) {
         super(type, name, mass);
@@ -45,5 +47,12 @@ public class Water extends Entity {
         return frozen;
     }
 
+    public void tick() {
+        this.tickCount++;
+    }
+
+    public boolean shouldUpdateEnvironment() {
+        return this.tickCount > 0 && this.tickCount % 2 == 0;
+    }
 
 }
