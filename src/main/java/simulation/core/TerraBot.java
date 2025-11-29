@@ -11,7 +11,6 @@ public class TerraBot {
     private Coordinates position;
     private int energy;
 
-    // Inventar și Memorie
     private List<Entity> inventory;
     private Set<Coordinates> visited;
 
@@ -22,7 +21,6 @@ public class TerraBot {
         this.energy = startEnergy;
         this.inventory = new ArrayList<>();
         this.visited = new HashSet<>();
-        // Marcăm startul ca vizitat
         this.visited.add(startPosition);
     }
 
@@ -32,7 +30,7 @@ public class TerraBot {
 
     public void setPosition(Coordinates position) {
         this.position = position;
-        this.visited.add(position); // Ținem minte pe unde mergem
+        this.visited.add(position);
     }
 
     public int getEnergy() {
@@ -55,15 +53,10 @@ public class TerraBot {
     public boolean isCharging(int currentTimestamp) {
         if (busyUntil == -1)
             return false;
-        return currentTimestamp < busyUntil;
-    }
-
-    public void addScannedEntity(Entity entity) {
-        this.inventory.add(entity);
-    }
-
-    public List<Entity> getInventory() {
-        return inventory;
+        if (currentTimestamp < busyUntil) {
+            return true;
+        }
+        return false;
     }
 
 }

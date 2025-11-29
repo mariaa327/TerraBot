@@ -10,4 +10,8 @@ public final class AlgaePlant extends Plant {
         return 20.0;
     }
 
+    @Override
+    protected double getOxygenFromPlant() {
+        return 0.5;
+    }
 }

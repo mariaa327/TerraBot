@@ -5,6 +5,8 @@ public abstract class Entity {
     private final String name;
     private double mass;
 
+    private boolean isScanned = false;
+
     protected Entity(String type, String name, double mass) {
         this.type = type;
         this.name = name;
@@ -27,5 +29,11 @@ public abstract class Entity {
         this.mass = mass;
     }
 
+    public void scan() {
+        this.isScanned = true;
+    }
 
+    public boolean isScanned() {
+        return isScanned;
+    }
 }

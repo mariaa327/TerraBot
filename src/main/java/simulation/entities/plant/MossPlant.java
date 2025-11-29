@@ -9,4 +9,9 @@ public final class MossPlant extends Plant {
     protected double getBaseStuckPossibility() {
         return 40.0;
     }
+
+    @Override
+    protected double getOxygenFromPlant() {
+        return 0.8;
+    }
 }

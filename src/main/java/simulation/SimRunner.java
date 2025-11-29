@@ -30,6 +30,7 @@ public class SimRunner {
     }
 
     public void run() {
+        int previousTimestamp = 1;
 
         for (CommandInput cmd : commands) {
             ObjectNode result = mapper.createObjectNode();
@@ -45,6 +46,16 @@ public class SimRunner {
                     simulations,
                     currentSimulationIndex
             );
+
+            if (currentSimulation != null && simulationStarted) {
+                int currentTimestamp = cmd.getTimestamp();
+                int steps = currentTimestamp - previousTimestamp;
+
+                for (int i = 0; i < steps; i++) {
+                    currentSimulation.update();
+                }
+            }
+            previousTimestamp = cmd.getTimestamp();
 
             Command command = null;
 
@@ -72,6 +83,9 @@ public class SimRunner {
                     break;
                 case "changeWeatherConditions":
                     command = new ChangeWeatherConditions();
+                    break;
+                case "scanObject":
+                    command = new ScanObject();
                     break;
                 default:
                     result.put("message",

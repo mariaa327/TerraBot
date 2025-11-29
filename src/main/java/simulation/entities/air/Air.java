@@ -10,16 +10,11 @@ public abstract class Air extends Entity {
     protected String activeWeatherType = null;
     protected int weatherEndTimestamp = -1;
 
-    // Stocăm parametrii evenimentului meteo pentru a-i folosi în formule
-    protected Double weatherVal = 0.0;     // rainfall, windSpeed, hikers
-    protected String weatherSeason = null; // season
-    protected Boolean weatherIsStorm = false; // desertStorm
+    protected Double weatherVal = 0.0;
+    protected String weatherSeason = null;
+    protected Boolean weatherIsStorm = false;
 
-    protected Air(String type,
-                  String name,
-                  double mass,
-                  double humidity,
-                  double temperature,
+    protected Air(String type, String name, double mass, double humidity, double temperature,
                   double oxygenLevel) {
         super(type, name, mass);
         this.humidity = humidity;
@@ -27,10 +22,12 @@ public abstract class Air extends Entity {
         this.oxygenLevel = oxygenLevel;
     }
 
-    // Getters standard
-    public double getHumidity() { return humidity; }
-    public double getTemperature() { return temperature; }
-    public double getOxygenLevel() { return oxygenLevel; }
+    public double getHumidity() {
+        return humidity; }
+    public double getTemperature() {
+        return temperature; }
+    public double getOxygenLevel() {
+        return oxygenLevel; }
 
     public void setOxygenLevel(double oxygenLevel) {
         this.oxygenLevel = oxygenLevel;

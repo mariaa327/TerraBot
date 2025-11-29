@@ -10,4 +10,8 @@ public final class GymnospermPlant extends Plant {
         return 60.0;
     }
 
+    @Override
+    protected double getOxygenFromPlant() {
+        return 0.0;
+    }
 }

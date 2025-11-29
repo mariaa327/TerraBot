@@ -10,15 +10,8 @@ public class Water extends Entity {
     private final double pH;
     private final boolean frozen;
 
-    public Water(String type,
-                 String name,
-                 double mass,
-                 double purity,
-                 double salinity,
-                 double turbidity,
-                 double contaminantIndex,
-                 double pH,
-                 boolean frozen) {
+    public Water(String type, String name, double mass, double purity, double salinity, double turbidity,
+                 double contaminantIndex, double pH, boolean frozen) {
         super(type, name, mass);
         this.purity = purity;
         this.salinity = salinity;
@@ -51,5 +44,6 @@ public class Water extends Entity {
     public boolean isFrozen() {
         return frozen;
     }
+
 
 }

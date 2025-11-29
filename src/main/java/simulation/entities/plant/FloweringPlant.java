@@ -10,4 +10,8 @@ public final class FloweringPlant extends Plant {
         return 90.0;
     }
 
+    @Override
+    protected double getOxygenFromPlant() {
+        return 6.0;
+    }
 }
