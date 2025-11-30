@@ -4,107 +4,125 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import fileio.CommandInput;
 import simulation.core.TerraBot;
 import simulation.entities.Entity;
-import simulation.entities.air.Air;
-import simulation.entities.soil.Soil;
 import simulation.map.MapCell;
 
-public class ImproveEnvironment implements Command {
+public final class ImproveEnvironment implements Command {
 
-    private static final String ERR_NOT_STARTED = "ERROR: Simulation not started. Cannot perform action";
-    private static final String ERR_STILL_CHARGING = "ERROR: Robot still charging. Cannot perform action";
-    private static final String ERR_NO_BATTERY = "ERROR: Not enough battery left. Cannot perform action";
-    private static final String ERR_SUBJECT_NOT_SAVED = "ERROR: Subject not yet saved. Cannot perform action";
-    private static final String ERR_FACT_NOT_SAVED = "ERROR: Fact not yet saved. Cannot perform action";
-    private static final String ERR_UNKNOWN_TYPE = "ERROR: Unknown improvement type.";
+    private static final String ERR_NOT_STARTED =
+            "ERROR: Simulation not started. Cannot perform action";
+    private static final String ERR_STILL_CHARGING =
+            "ERROR: Robot still charging. Cannot perform action";
+    private static final String ERR_NO_BATTERY =
+            "ERROR: Not enough battery left. Cannot perform action";
+    private static final String ERR_SUBJECT_NOT_SAVED =
+            "ERROR: Subject not yet saved. Cannot perform action";
+    private static final String ERR_FACT_NOT_SAVED =
+            "ERROR: Fact not yet saved. Cannot perform action";
+    private static final String ERR_UNKNOWN_TYPE =
+            "ERROR: Unknown improvement type.";
+    private static final String ERR_MISSING_ENTITY =
+            "ERROR: Cannot improve environment here (missing soil/air).";
 
-    private abstract class Improvement {
-        abstract boolean apply(MapCell cell);
+    private static final int ENERGY_COST = 10;
+    private static final double PLANT_OXYGEN_INCREASE = 0.3;
+    private static final double FERTILIZER_ORGANIC_MATTER_INCREASE = 0.3;
+    private static final double HUMIDITY_INCREASE = 0.2;
+    private static final double MOISTURE_INCREASE = 0.2;
+    private static final double PRECISION_FACTOR = 100.0;
+    private static final double MIN_ENERGY_REQUIRED = 10;
+
+    private abstract static class Improvement {
         abstract String getFact(String name);
         abstract String getMsg(String name);
+        abstract boolean apply(MapCell cell);
     }
 
-    private class Planting extends Improvement {
+    private static final class Planting extends Improvement {
         @Override
-        String getFact(String name) {
+        String getFact(final String name) {
             return "Method to plant " + name;
         }
 
         @Override
-        String getMsg(String name) {
+        String getMsg(final String name) {
             return "The " + name + " was planted successfully.";
         }
 
         @Override
-        boolean apply(MapCell cell) {
+        boolean apply(final MapCell cell) {
             if (cell.getAir() != null) {
-                double val = cell.getAir().getOxygenLevel() + 0.3;
-                cell.getAir().setOxygenLevel(Math.round(val * 100.0) / 100.0);
+                double val = cell.getAir().getOxygenLevel() + PLANT_OXYGEN_INCREASE;
+                val = Math.round(val * PRECISION_FACTOR) / PRECISION_FACTOR;
+                cell.getAir().setOxygenLevel(val);
                 return true;
             }
             return false;
         }
     }
 
-    private class Fertilizing extends Improvement {
+    private static final class Fertilizing extends Improvement {
         @Override
-        String getFact(String name) {
+        String getFact(final String name) {
             return "Method to fertilize soil with " + name;
         }
 
         @Override
-        String getMsg(String name) {
+        String getMsg(final String name) {
             return "The soil was successfully fertilized using " + name + ".";
         }
 
         @Override
-        boolean apply(MapCell cell) {
+        boolean apply(final MapCell cell) {
             if (cell.getSoil() != null) {
-                double val = cell.getSoil().getOrganicMatter() + 0.3;
-                cell.getSoil().setOrganicMatter(Math.round(val * 100.0) / 100.0);
+                double val = cell.getSoil().getOrganicMatter() + FERTILIZER_ORGANIC_MATTER_INCREASE;
+                val = Math.round(val * PRECISION_FACTOR) / PRECISION_FACTOR;
+                cell.getSoil().setOrganicMatter(val);
                 return true;
             }
             return false;
         }
     }
 
-    private class Humidifying extends Improvement {
+    private static final class Humidifying extends Improvement {
         @Override
-        String getFact(String name) {
+        String getFact(final String name) {
             return "Method to increase humidity with " + name;
         }
 
         @Override
-        String getMsg(String name) {
+        String getMsg(final String name) { // FIX: Parameter final
             return "The humidity was successfully increased using " + name + ".";
         }
 
         @Override
-        boolean apply(MapCell cell) {
+        boolean apply(final MapCell cell) {
             if (cell.getAir() != null) {
-                double val = cell.getAir().getHumidity() + 0.2;
-                cell.getAir().setHumidity(Math.round(val * 100.0) / 100.0);
+                double val = cell.getAir().getHumidity() + HUMIDITY_INCREASE;
+                val = Math.round(val * PRECISION_FACTOR) / PRECISION_FACTOR;
+                cell.getAir().setHumidity(val);
                 return true;
             }
             return false;
         }
     }
 
-    private class Moistening extends Improvement {
+    private static final class Moistening extends Improvement {
         @Override
-        String getFact(String name) {
+        String getFact(final String name) {
             return "Method to increase moisture with " + name;
         }
 
         @Override
-        String getMsg(String name) {
+        String getMsg(final String name) { // FIX: Parameter final
             return "The moisture was successfully increased using " + name + ".";
         }
 
         @Override
-        boolean apply(MapCell cell) {
+        boolean apply(final MapCell cell) {
             if (cell.getSoil() != null) {
-                double val = cell.getSoil().getWaterRetention() + 0.2;
-                cell.getSoil().setWaterRetention(Math.round(val * 100.0) / 100.0);
+                double val = cell.getSoil().getWaterRetention() + MOISTURE_INCREASE;
+                val = Math.round(val * PRECISION_FACTOR) / PRECISION_FACTOR;
+                cell.getSoil().setWaterRetention(val);
                 return true;
             }
             return false;
@@ -112,7 +130,7 @@ public class ImproveEnvironment implements Command {
     }
 
     @Override
-    public void execute(CommanContext ctx) {
+    public void execute(final CommanContext ctx) {
         ObjectNode result = ctx.getResultNode();
 
         if (!ctx.isSimulationStarted() || ctx.getSimulation() == null) {
@@ -121,14 +139,14 @@ public class ImproveEnvironment implements Command {
         }
 
         TerraBot robot = ctx.getSimulation().getBot();
-        CommandInput input = ctx.getCommandInput();
+        final CommandInput input = ctx.getCommandInput();
 
         if (robot.isCharging(input.getTimestamp())) {
             result.put("message", ERR_STILL_CHARGING);
             return;
         }
 
-        if (robot.getEnergy() < 10) {
+        if (robot.getEnergy() < MIN_ENERGY_REQUIRED) {
             result.put("message", ERR_NO_BATTERY);
             return;
         }
@@ -178,10 +196,10 @@ public class ImproveEnvironment implements Command {
         boolean success = act.apply(currentCell);
 
         if (success) {
-            robot.consumeEnergy(10);
+            robot.consumeEnergy(ENERGY_COST);
             result.put("message", act.getMsg(entityName));
         } else {
-            result.put("message", "ERROR: Cannot improve environment here (missing soil/air).");
+            result.put("message", ERR_MISSING_ENTITY);
         }
     }
 }

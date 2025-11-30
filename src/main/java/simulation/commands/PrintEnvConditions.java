@@ -3,22 +3,24 @@ package simulation.commands;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import simulation.core.Simulation;
-import simulation.entities.air.*;
-import simulation.entities.animal.Animal;
+import simulation.core.TerraBot;
+import simulation.entities.air.Air;
 import simulation.entities.plant.Plant;
-import simulation.entities.soil.*;
+import simulation.entities.animal.Animal;
+import simulation.entities.soil.Soil;
 import simulation.entities.water.Water;
 import simulation.map.Coordinates;
 import simulation.map.MapCell;
-import simulation.core.TerraBot;
 
-public class PrintEnvConditions implements Command {
+public final class PrintEnvConditions implements Command {
 
-    private static final String ERR_NOT_STARTED = "ERROR: Simulation not started. Cannot perform action";
-    private static final String ERR_STILL_CHARGING = "ERROR: Robot still charging. Cannot perform action";
+    private static final String ERR_NOT_STARTED =
+            "ERROR: Simulation not started. Cannot perform action";
+    private static final String ERR_STILL_CHARGING =
+            "ERROR: Robot still charging. Cannot perform action";
 
     @Override
-    public void execute(CommanContext ctx) {
+    public void execute(final CommanContext ctx) {
         ObjectNode result = ctx.getResultNode();
         ObjectMapper mapper = ctx.getMapper();
 
@@ -37,6 +39,7 @@ public class PrintEnvConditions implements Command {
 
         Coordinates pos = sim.getBot().getPosition();
         MapCell cell = sim.getMap().getCell(pos);
+        int currentTimestamp = ctx.getCommandInput().getTimestamp();
 
         ObjectNode out = mapper.createObjectNode();
 
@@ -52,24 +55,10 @@ public class PrintEnvConditions implements Command {
             s.put("organicMatter", soil.getOrganicMatter());
             s.put("soilQuality", soil.getSoilQuality());
 
-            String soilType = soil.getType();
-            if ("ForestSoil".equals(soilType)) {
-                ForestSoil fs = (ForestSoil) soil;
-                s.put("leafLitter", fs.getLeafLitter());
-            } else if ("SwampSoil".equals(soilType)) {
-                SwampSoil ss = (SwampSoil) soil;
-                s.put("waterLogging", ss.getWaterLogging());
-            } else if ("DesertSoil".equals(soilType)) {
-                DesertSoil ds = (DesertSoil) soil;
-                s.put("salinity", ds.getSalinity());
-            } else if ("GrasslandSoil".equals(soilType)) {
-                GrasslandSoil gs = (GrasslandSoil) soil;
-                s.put("rootDensity", gs.getRootDensity());
-            } else if ("TundraSoil".equals(soilType)) {
-                TundraSoil ts = (TundraSoil) soil;
-                s.put("permafrostDepth", ts.getPermafrostDepth());
+            ObjectNode specificSoil = soil.getSpecificConditions(mapper);
+            if (specificSoil != null) {
+                s.setAll(specificSoil);
             }
-
             out.set("soil", s);
         }
 
@@ -100,8 +89,6 @@ public class PrintEnvConditions implements Command {
             out.set("water", w);
         }
 
-        int currentTimestamp = ctx.getCommandInput().getTimestamp();
-
         Air air = cell.getAir();
         if (air != null) {
             ObjectNode a = mapper.createObjectNode();
@@ -111,30 +98,12 @@ public class PrintEnvConditions implements Command {
             a.put("humidity", air.getHumidity());
             a.put("temperature", air.getTemperature());
             a.put("oxygenLevel", air.getOxygenLevel());
-            //a.put("airQuality", air.getAirQuality());
-
             a.put("airQuality", air.getAirQuality(currentTimestamp));
-            String airType = air.getType();
-            if ("TropicalAir".equals(airType)) {
-                TropicalAir ta = (TropicalAir) air;
-                double roundedCo2 =
-                        Math.round(ta.getCo2Level() * 100.0) / 100.0;
-                a.put("co2Level", roundedCo2);
-            } else if ("TemperateAir".equals(airType)) {
-                TemperateAir tmp = (TemperateAir) air;
-                a.put("pollenLevel", tmp.getPollenLevel());
-            } else if ("DesertAir".equals(airType)) {
-                DesertAir da = (DesertAir) air;
-                //a.put("dustParticles", da.getDustParticles());
-                a.put("desertStorm", da.isDesertStormActive(currentTimestamp));
-            } else if ("PolarAir".equals(airType)) {
-                PolarAir pa = (PolarAir) air;
-                a.put("iceCrystalConcentration", pa.getIceCrystalConcentration());
-            } else if ("MountainAir".equals(airType)) {
-                MountainAir ma = (MountainAir) air;
-                a.put("altitude", ma.getAltitude());
-            }
 
+            ObjectNode specificAir = air.getSpecificConditions(mapper, currentTimestamp);
+            if (specificAir != null) {
+                a.setAll(specificAir);
+            }
             out.set("air", a);
         }
 

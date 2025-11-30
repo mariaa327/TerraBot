@@ -2,12 +2,13 @@ package simulation.commands;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-public class EndSimulation implements Command {
+public final class EndSimulation implements Command {
 
-    private static final String ERR_NOT_STARTED = "ERROR: Simulation not started. Cannot perform action";
+    private static final String ERR_NOT_STARTED =
+            "ERROR: Simulation not started. Cannot perform action";
 
     @Override
-    public void execute(CommanContext ctx) {
+    public void execute(final CommanContext ctx) {
         ObjectNode result = ctx.getResultNode();
 
         if (!ctx.isSimulationStarted() || ctx.getSimulation() == null) {

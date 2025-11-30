@@ -7,12 +7,13 @@ import simulation.core.TerraBot;
 
 import java.util.List;
 
-public class PrintKnowledgeBase implements Command {
+public final class PrintKnowledgeBase implements Command {
 
-    private static final String ERR_NOT_STARTED = "ERROR: Simulation not started. Cannot perform action";
+    private static final String ERR_NOT_STARTED =
+            "ERROR: Simulation not started. Cannot perform action";
 
     @Override
-    public void execute(CommanContext ctx) {
+    public void execute(final CommanContext ctx) {
         ObjectNode result = ctx.getResultNode();
 
         if (!ctx.isSimulationStarted() || ctx.getSimulation() == null) {

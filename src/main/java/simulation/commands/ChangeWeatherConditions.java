@@ -2,20 +2,37 @@ package simulation.commands;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import fileio.CommandInput;
-import simulation.core.Simulation;
 import simulation.core.TerraBot;
 import simulation.entities.air.Air;
 import simulation.map.MapCell;
 import simulation.map.SimulationMap;
 
-public class ChangeWeatherConditions implements Command {
+import java.util.HashMap;
+import java.util.Map;
 
-    private static final String ERR_NOT_STARTED = "ERROR: Simulation not started. Cannot perform action";
-    private static final String ERR_ROBOT_CHARGING = "ERROR: Robot still charging. Cannot perform action";
-    private static final String ERR_NO_EFFECT = "ERROR: The weather change does not affect the environment. Cannot perform action";
+public final class ChangeWeatherConditions implements Command {
+
+    private static final String ERR_NOT_STARTED =
+            "ERROR: Simulation not started. Cannot perform action";
+    private static final String ERR_ROBOT_CHARGING =
+            "ERROR: Robot still charging. Cannot perform action";
+    private static final String ERR_NO_EFFECT =
+            "ERROR: The weather change does not affect the environment. Cannot perform action";
+    private static final String MSG_AFFECTED = "The weather has changed.";
+
+    private final Map<String, String> weatherRules;
+
+    public ChangeWeatherConditions() {
+        weatherRules = new HashMap<>();
+        weatherRules.put("desertStorm", "DesertAir");
+        weatherRules.put("peopleHiking", "MountainAir");
+        weatherRules.put("newSeason", "TemperateAir");
+        weatherRules.put("polarStorm", "PolarAir");
+        weatherRules.put("rainfall", "TropicalAir");
+    }
 
     @Override
-    public void execute(CommanContext ctx) {
+    public void execute(final CommanContext ctx) {
         ObjectNode result = ctx.getResultNode();
 
         if (!ctx.isSimulationStarted() || ctx.getSimulation() == null) {
@@ -29,10 +46,18 @@ public class ChangeWeatherConditions implements Command {
             return;
         }
 
-        Simulation sim = ctx.getSimulation();
-        SimulationMap map = sim.getMap();
-        CommandInput input = ctx.getCommandInput();
+        final CommandInput input = ctx.getCommandInput();
+        SimulationMap map = ctx.getSimulation().getMap();
         String weatherType = input.getType();
+
+        if (!weatherRules.containsKey(weatherType)) {
+            result.put("message", ERR_NO_EFFECT);
+            return;
+        }
+
+        String targetAirType = weatherRules.get(weatherType);
+
+        double intensity = getWeatherIntensity(input);
 
         boolean affected = false;
 
@@ -41,47 +66,48 @@ public class ChangeWeatherConditions implements Command {
                 MapCell cell = map.getCell(x, y);
                 Air air = cell.getAir();
 
-                if (air != null && isAffected(air, weatherType)) {
-
-                    Double val = 0.0;
-                    if (input.getRainfall() != 0) {
-                        val = input.getRainfall();
-                    } else if (input.getWindSpeed() != 0) {
-                        val = input.getWindSpeed();
-                    } else if (input.getNumberOfHikers() != 0) {
-                        val = (double) input.getNumberOfHikers();
-                    }
-
-                    air.setWeatherEvent(weatherType, input.getTimestamp(), val, input.getSeason(), input.isDesertStorm());
-
+                if (applyWeatherToCell(cell, targetAirType, input, intensity)) {
                     affected = true;
                 }
             }
         }
 
         if (affected) {
-            result.put("message", "The weather has changed.");
+            result.put("message", MSG_AFFECTED);
         } else {
             result.put("message", ERR_NO_EFFECT);
         }
     }
 
-    private boolean isAffected(Air air, String weatherType) {
-        String airType = air.getType();
-
-        switch (weatherType) {
-            case "desertStorm":
-                return "DesertAir".equals(airType);
-            case "peopleHiking":
-                return "MountainAir".equals(airType);
-            case "newSeason":
-                return "TemperateAir".equals(airType);
-            case "polarStorm":
-                return "PolarAir".equals(airType);
-            case "rainfall":
-                return "TropicalAir".equals(airType);
-            default:
-                return false;
+    private double getWeatherIntensity(final CommandInput input) {
+        if (input.getRainfall() != 0) {
+            return input.getRainfall();
         }
+        if (input.getWindSpeed() != 0) {
+            return input.getWindSpeed();
+        }
+        if (input.getNumberOfHikers() != 0) {
+            return (double) input.getNumberOfHikers();
+        }
+        return 0.0;
+    }
+
+    private boolean applyWeatherToCell(final MapCell cell, final String targetType,
+                                       final CommandInput input, final double val) {
+        Air air = cell.getAir();
+
+        if (air == null || !targetType.equals(air.getType())) {
+            return false;
+        }
+
+        air.setWeatherEvent(
+                input.getType(),
+                input.getTimestamp(),
+                val,
+                input.getSeason(),
+                input.isDesertStorm()
+        );
+
+        return true;
     }
 }

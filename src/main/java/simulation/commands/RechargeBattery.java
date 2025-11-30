@@ -4,13 +4,15 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import simulation.core.Simulation;
 import simulation.core.TerraBot;
 
-public class RechargeBattery implements Command {
+public final class RechargeBattery implements Command {
 
-    private static final String ERR_NOT_STARTED = "ERROR: Simulation not started. Cannot perform action";
-    private static final String ERR_STILL_CHARGING = "ERROR: Robot still charging. Cannot perform action";
+    private static final String ERR_NOT_STARTED =
+            "ERROR: Simulation not started. Cannot perform action";
+    private static final String ERR_STILL_CHARGING =
+            "ERROR: Robot still charging. Cannot perform action";
 
     @Override
-    public void execute(CommanContext ctx) {
+    public void execute(final CommanContext ctx) {
         ObjectNode result = ctx.getResultNode();
         int currentTimestamp = ctx.getCommandInput().getTimestamp();
 

@@ -4,16 +4,21 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import fileio.CommandInput;
 import simulation.core.TerraBot;
 
-public class LearnFact implements Command {
+public final class LearnFact implements Command {
 
-    private static final String ERR_NOT_STARTED = "ERROR: Simulation not started. Cannot perform action";
-    private static final String ERR_STILL_CHARGING = "ERROR: Robot still charging. Cannot perform action";
-    private static final String ERR_NO_BATTERY = "ERROR: Not enough battery left. Cannot perform action";
-    private static final String ERR_SUBJECT_NOT_SAVED = "ERROR: Subject not yet saved. Cannot perform action";
-    private static final String SUCCESS_MSG = "The fact has been successfully saved in the database.";
+    private static final String ERR_NOT_STARTED =
+            "ERROR: Simulation not started. Cannot perform action";
+    private static final String ERR_STILL_CHARGING =
+            "ERROR: Robot still charging. Cannot perform action";
+    private static final String ERR_NO_BATTERY =
+            "ERROR: Not enough battery left. Cannot perform action";
+    private static final String ERR_SUBJECT_NOT_SAVED =
+            "ERROR: Subject not yet saved. Cannot perform action";
+    private static final String SUCCESS_MSG =
+            "The fact has been successfully saved in the database.";
 
     @Override
-    public void execute(CommanContext ctx) {
+    public void execute(final CommanContext ctx) {
         ObjectNode result = ctx.getResultNode();
 
         if (!ctx.isSimulationStarted() || ctx.getSimulation() == null) {

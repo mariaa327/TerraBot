@@ -9,17 +9,21 @@ import simulation.map.Coordinates;
 import simulation.map.MapCell;
 import simulation.map.SimulationMap;
 
-public class ScanObject implements Command {
+public final class ScanObject implements Command {
 
-    private static final String ERR_NOT_STARTED = "ERROR: Simulation not started. Cannot perform action";
-    private static final String ERR_NO_ENERGY = "ERROR: Not enough energy to perform action";
-    private static final String ERR_STILL_CHARGING = "ERROR: Robot still charging. Cannot perform action";
-    private static final String ERR_OBJ_NOT_FOUND = "ERROR: Object not found. Cannot perform action";
+    private static final String ERR_NOT_STARTED =
+            "ERROR: Simulation not started. Cannot perform action";
+    private static final String ERR_NO_ENERGY =
+            "ERROR: Not enough energy to perform action";
+    private static final String ERR_STILL_CHARGING =
+            "ERROR: Robot still charging. Cannot perform action";
+    private static final String ERR_OBJ_NOT_FOUND =
+            "ERROR: Object not found. Cannot perform action";
 
     private static final int SCAN_COST = 7;
 
     @Override
-    public void execute(CommanContext ctx) {
+    public void execute(final CommanContext ctx) {
         ObjectNode result = ctx.getResultNode();
 
         if (!ctx.isSimulationStarted() || ctx.getSimulation() == null) {
@@ -92,16 +96,20 @@ public class ScanObject implements Command {
         }
     }
 
-    private String identifyType(String color, String smell, String sound) {
-        if ("none".equalsIgnoreCase(color) && "none".equalsIgnoreCase(smell) && "none".equalsIgnoreCase(sound)) {
+    private String identifyType(final String color, final String smell,
+                                final String sound) {
+        if ("none".equalsIgnoreCase(color) && "none".equalsIgnoreCase(smell)
+                && "none".equalsIgnoreCase(sound)) {
             return "water";
         }
 
-        if (!"none".equalsIgnoreCase(color) && !"none".equalsIgnoreCase(smell) && "none".equalsIgnoreCase(sound)) {
+        if (!"none".equalsIgnoreCase(color) && !"none".equalsIgnoreCase(smell)
+                && "none".equalsIgnoreCase(sound)) {
             return "plant";
         }
 
-        if (!"none".equalsIgnoreCase(color) && !"none".equalsIgnoreCase(smell) && !"none".equalsIgnoreCase(sound)) {
+        if (!"none".equalsIgnoreCase(color) && !"none".equalsIgnoreCase(smell)
+                && !"none".equalsIgnoreCase(sound)) {
             return "animal";
         }
         return null;

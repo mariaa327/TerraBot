@@ -7,15 +7,20 @@ import simulation.map.Coordinates;
 import simulation.map.MapCell;
 import simulation.map.SimulationMap;
 
-public class MoveRobot implements Command {
+public final class MoveRobot implements Command {
 
-    private static final String ERR_NOT_STARTED = "ERROR: Simulation not started. Cannot perform action";
-    private static final String ERR_NO_BATTERY = "ERROR: Not enough battery left. Cannot perform action";
-    private static final String ERR_STILL_CHARGING = "ERROR: Robot still charging. Cannot perform action";
-    private static final String SUCCESS_MSG = "The robot has successfully moved to position (%d, %d).";
+    private static final String ERR_NOT_STARTED =
+            "ERROR: Simulation not started. Cannot perform action";
+    private static final String ERR_NO_BATTERY =
+            "ERROR: Not enough battery left. Cannot perform action";
+    private static final String ERR_STILL_CHARGING =
+            "ERROR: Robot still charging. Cannot perform action";
+    private static final String SUCCESS_MSG =
+            "The robot has successfully moved to position (%d, %d).";
+    private static final String ERR_CANNOT_MOVE = "ERROR: Cannot move.";
 
     @Override
-    public void execute(CommanContext ctx) {
+    public void execute(final CommanContext ctx) {
         ObjectNode result = ctx.getResultNode();
 
         if (!ctx.isSimulationStarted() || ctx.getSimulation() == null) {
@@ -36,28 +41,24 @@ public class MoveRobot implements Command {
         }
 
         int[][] directions = {
-                {0, 1},  // Jos
-                {1, 0},  // Dreapta
-                {0, -1}, // Sus
-                {-1, 0}  // Stanga
+                {0, 1},
+                {1, 0},
+                {0, -1},
+                {-1, 0}
         };
 
         int bestX = -1;
         int bestY = -1;
-
         int bestScore = Integer.MAX_VALUE;
-
         boolean foundMove = false;
 
         for (int[] dir : directions) {
             int nextX = currentPos.getX() + dir[0];
             int nextY = currentPos.getY() + dir[1];
 
-            if (isValid(nextX, nextY, map)) {
+            if (nextX >= 0 && nextX < map.getWidth() && nextY >= 0 && nextY < map.getHeight()) {
                 MapCell cell = map.getCell(nextX, nextY);
-
                 int currentScore = calculateSafetyScore(cell, currentTimestamp);
-
                 if (currentScore < bestScore) {
                     bestScore = currentScore;
                     bestX = nextX;
@@ -76,15 +77,11 @@ public class MoveRobot implements Command {
                 result.put("message", ERR_NO_BATTERY);
             }
         } else {
-            result.put("message", "ERROR: Cannot move.");
+            result.put("message", ERR_CANNOT_MOVE);
         }
     }
 
-    private boolean isValid(int x, int y, SimulationMap map) {
-        return x >= 0 && x < map.getWidth() && y >= 0 && y < map.getHeight();
-    }
-
-    private int calculateSafetyScore(MapCell cell, int currentTimestamp) {
+    private int calculateSafetyScore(final MapCell cell, final int currentTimestamp) {
         double soilRisk = cell.getSoil().getStuckProbability();
         double airRisk = cell.getAir().getDamageProbability(currentTimestamp);
 

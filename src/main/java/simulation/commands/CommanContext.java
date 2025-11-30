@@ -8,25 +8,21 @@ import simulation.core.Simulation;
 
 import java.util.List;
 
-public class CommanContext {
+public final class CommanContext {
 
     private final ObjectMapper mapper;
     private final ObjectNode resultNode;
     private final CommandInput commandInput;
-
     private Simulation simulation;
     private boolean simulationStarted;
-
     private final List<SimulationInput> simulations;
     private int currentSimulationIndex;
 
-    public CommanContext(ObjectMapper mapper,
-                         ObjectNode resultNode,
-                         CommandInput commandInput,
-                         Simulation simulation,
-                         boolean simulationStarted,
-                         List<SimulationInput> simulations,
-                         int currentSimulationIndex) {
+    public CommanContext(final ObjectMapper mapper, final ObjectNode resultNode,
+                         final CommandInput commandInput,
+                         final Simulation simulation, final boolean simulationStarted,
+                         final List<SimulationInput> simulations,
+                         final int currentSimulationIndex) {
         this.mapper = mapper;
         this.resultNode = resultNode;
         this.commandInput = commandInput;
@@ -52,7 +48,7 @@ public class CommanContext {
         return simulation;
     }
 
-    public void setSimulation(Simulation simulation) {
+    public void setSimulation(final Simulation simulation) {
         this.simulation = simulation;
     }
 
@@ -60,7 +56,7 @@ public class CommanContext {
         return simulationStarted;
     }
 
-    public void setSimulationStarted(boolean simulationStarted) {
+    public void setSimulationStarted(final boolean simulationStarted) {
         this.simulationStarted = simulationStarted;
     }
 
