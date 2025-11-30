@@ -14,6 +14,10 @@ public abstract class Plant extends Entity {
 
     protected abstract double getOxygenFromPlant();
 
+    public String getGrowthStage() {
+        return growthStage;
+    }
+
     public double getStuckProbability() {
         return getBaseStuckPossibility() / 100.0;
     }

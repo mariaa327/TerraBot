@@ -30,6 +30,10 @@ public class RechargeBattery implements Command {
         int amount = ctx.getCommandInput().getTimeToCharge();
         robot.recharge(amount, currentTimestamp);
 
+        for (int i = 0; i < amount; i++) {
+            sim.update();
+        }
+
         result.put("message", "Robot battery is charging.");
     }
 }

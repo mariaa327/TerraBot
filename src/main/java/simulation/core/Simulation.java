@@ -62,9 +62,13 @@ public class Simulation {
         if (plant != null && plant.isScanned()) {
             if (soil != null) {
                 plant.grow();
+                if ("dead".equals(plant.getGrowthStage())) {
+                    cell.setPlant(null);
+                    plant = null;
+                }
             }
 
-            if (air != null) {
+            if (air != null && plant != null) {
                 double oxygenProduced = plant.produceOxygen();
                 double newOxygen = air.getOxygenLevel() + oxygenProduced;
                 newOxygen = Math.round(newOxygen * 100.0) / 100.0;
