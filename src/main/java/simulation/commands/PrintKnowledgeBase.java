@@ -3,8 +3,8 @@ package simulation.commands;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import simulation.core.ScientificTopic;
 import simulation.core.TerraBot;
+
 import java.util.List;
 
 public class PrintKnowledgeBase implements Command {
@@ -21,28 +21,27 @@ public class PrintKnowledgeBase implements Command {
         }
 
         TerraBot robot = ctx.getSimulation().getBot();
-        List<ScientificTopic> topics = robot.getKnowledgeBase();
-
+        List<TerraBot.AbstractKnowledge> list = robot.getKnowledgeBase();
         ObjectMapper mapper = new ObjectMapper();
-        ArrayNode outputArray = mapper.createArrayNode();
+        ArrayNode finalOutput = mapper.createArrayNode();
 
-        for (ScientificTopic topic : topics) {
+        for (int i = 0; i < list.size(); i++) {
+            TerraBot.AbstractKnowledge elem = list.get(i);
 
-            if (topic.hasFacts()) {
-                ObjectNode topicNode = mapper.createObjectNode();
+            if (elem.hasInfo()) {
+                ObjectNode obj = mapper.createObjectNode();
+                obj.put("topic", elem.getName());
+                ArrayNode arr = mapper.createArrayNode();
+                List<String> infoList = elem.getInfo();
 
-                topicNode.put("topic", topic.getName());
-
-                ArrayNode factsArray = mapper.createArrayNode();
-                for (String f : topic.getFacts()) {
-                    factsArray.add(f);
+                for (int j = 0; j < infoList.size(); j++) {
+                    arr.add(infoList.get(j));
                 }
-                topicNode.set("facts", factsArray);
 
-                outputArray.add(topicNode);
+                obj.set("facts", arr);
+                finalOutput.add(obj);
             }
         }
-
-        result.set("output", outputArray);
+        result.set("output", finalOutput);
     }
 }

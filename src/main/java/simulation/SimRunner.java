@@ -93,6 +93,9 @@ public class SimRunner {
                 case "printKnowledgeBase":
                     command = new PrintKnowledgeBase();
                     break;
+                case "improveEnvironment":
+                    command = new ImproveEnvironment();
+                    break;
                 default:
                     result.put("message", "ERROR: Simulation not started. Cannot perform action");
             }
