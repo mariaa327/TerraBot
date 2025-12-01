@@ -9,6 +9,13 @@ import simulation.map.Coordinates;
 import simulation.map.MapCell;
 import simulation.map.SimulationMap;
 
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * the command executes a scan operation at the TerraBot's current
+ * location to identify and record an entity based on sensory input
+ */
 public final class ScanObject implements Command {
 
     private static final String ERR_NOT_STARTED =
@@ -22,6 +29,86 @@ public final class ScanObject implements Command {
 
     private static final int SCAN_COST = 7;
 
+    private interface ScanStrategy {
+        boolean matches(String color, String smell, String sound);
+        Entity getEntity(MapCell cell);
+        String getMessageType();
+    }
+
+    private static final class PlantScanStrategy implements ScanStrategy {
+        @Override
+        public boolean matches(final String color, final String smell, final String sound) {
+            if (!"none".equalsIgnoreCase(color) && !"none".equalsIgnoreCase(smell)
+                    && "none".equalsIgnoreCase(sound)) {
+                return true;
+            }
+            return false;
+        }
+        @Override
+        public Entity getEntity(final MapCell cell) {
+            return cell.getPlant();
+        }
+        @Override
+        public String getMessageType() {
+            return "a plant";
+        }
+    }
+
+    private static final class AnimalScanStrategy implements ScanStrategy {
+        @Override
+        public boolean matches(final String color, final String smell, final String sound) {
+            if (!"none".equalsIgnoreCase(color) && !"none".equalsIgnoreCase(smell)
+                    && !"none".equalsIgnoreCase(sound)) {
+                return true;
+            }
+            return false;
+        }
+        @Override
+        public Entity getEntity(final MapCell cell) {
+            return cell.getAnimal();
+        }
+        @Override
+        public String getMessageType() {
+            return "an animal";
+        }
+    }
+
+    private static final class WaterScanStrategy implements ScanStrategy {
+        @Override
+        public boolean matches(final String color, final String smell, final String sound) {
+            if ("none".equalsIgnoreCase(color) && "none".equalsIgnoreCase(smell)
+                    && "none".equalsIgnoreCase(sound)) {
+                return true;
+            }
+            return false;
+        }
+        @Override
+        public Entity getEntity(final MapCell cell) {
+            return cell.getWater();
+        }
+        @Override
+        public String getMessageType() {
+            return "water";
+        }
+    }
+
+    private static final List<ScanStrategy> ALL_STRATEGIES;
+
+    static {
+        ALL_STRATEGIES = new ArrayList<>();
+        ALL_STRATEGIES.add(new PlantScanStrategy());
+        ALL_STRATEGIES.add(new AnimalScanStrategy());
+        ALL_STRATEGIES.add(new WaterScanStrategy());
+    }
+
+    /**
+     * executes the scan object command
+     * it verifies preconditions (energy, charging status)
+     * finds the matching scan strategy based on input and attempts to scan the
+     * corresponding entity in the current cell
+     * @param ctx the context object containing the simulation state
+     * @return void for errors
+     */
     @Override
     public void execute(final CommanContext ctx) {
         ObjectNode result = ctx.getResultNode();
@@ -45,46 +132,32 @@ public final class ScanObject implements Command {
         }
 
         CommandInput input = ctx.getCommandInput();
-        String detectedType = identifyType(
-                input.getColor(),
-                input.getSmell(),
-                input.getSound()
-        );
-
-        if (detectedType == null) {
-            result.put("message", ERR_OBJ_NOT_FOUND);
-            return;
-        }
-
         SimulationMap map = sim.getMap();
         Coordinates pos = robot.getPosition();
         MapCell cell = map.getCell(pos.getX(), pos.getY());
 
-        Entity entityToScan = null;
-        String messageType = "";
+        String color = input.getColor();
+        String smell = input.getSmell();
+        String sound = input.getSound();
 
-        switch (detectedType) {
-            case "plant":
-                if (cell.getPlant() != null) {
-                    entityToScan = cell.getPlant();
-                    messageType = "a plant";
-                }
+        Entity entityToScan = null;
+        String messageType = null;
+        ScanStrategy foundStrategy = null;
+
+        for (ScanStrategy strategy : ALL_STRATEGIES) {
+            if (strategy.matches(color, smell, sound)) {
+                foundStrategy = strategy;
                 break;
-            case "animal":
-                if (cell.getAnimal() != null) {
-                    entityToScan = cell.getAnimal();
-                    messageType = "an animal";
-                }
-                break;
-            case "water":
-                if (cell.getWater() != null) {
-                    entityToScan = cell.getWater();
-                    messageType = "water";
-                }
-                break;
-            default:
-                break;
+            }
         }
+
+        if (foundStrategy == null) {
+            result.put("message", ERR_OBJ_NOT_FOUND);
+            return;
+        }
+
+        entityToScan = foundStrategy.getEntity(cell);
+        messageType = foundStrategy.getMessageType();
 
         if (entityToScan != null) {
             entityToScan.scan();
@@ -94,24 +167,5 @@ public final class ScanObject implements Command {
         } else {
             result.put("message", ERR_OBJ_NOT_FOUND);
         }
-    }
-
-    private String identifyType(final String color, final String smell,
-                                final String sound) {
-        if ("none".equalsIgnoreCase(color) && "none".equalsIgnoreCase(smell)
-                && "none".equalsIgnoreCase(sound)) {
-            return "water";
-        }
-
-        if (!"none".equalsIgnoreCase(color) && !"none".equalsIgnoreCase(smell)
-                && "none".equalsIgnoreCase(sound)) {
-            return "plant";
-        }
-
-        if (!"none".equalsIgnoreCase(color) && !"none".equalsIgnoreCase(smell)
-                && !"none".equalsIgnoreCase(sound)) {
-            return "animal";
-        }
-        return null;
     }
 }

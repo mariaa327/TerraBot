@@ -12,6 +12,10 @@ import simulation.entities.water.Water;
 import simulation.map.Coordinates;
 import simulation.map.MapCell;
 
+/**
+ * the command retrieves and serializes the environmental data
+ * of the map cell where the TerraBot is currently located
+ */
 public final class PrintEnvConditions implements Command {
 
     private static final String ERR_NOT_STARTED =
@@ -19,6 +23,14 @@ public final class PrintEnvConditions implements Command {
     private static final String ERR_STILL_CHARGING =
             "ERROR: Robot still charging. Cannot perform action";
 
+    /**
+     * executes the print environment conditions command
+     * checks simulation status and robot charging status
+     * retrieves all entities from the robot's current cell and serializes their
+     * common and specific properties into the output JSON node
+     * @param ctx the context object containing the simulation state
+     * @return void for errors
+     */
     @Override
     public void execute(final CommanContext ctx) {
         ObjectNode result = ctx.getResultNode();

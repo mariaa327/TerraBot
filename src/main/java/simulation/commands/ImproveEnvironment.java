@@ -5,7 +5,13 @@ import fileio.CommandInput;
 import simulation.core.TerraBot;
 import simulation.entities.Entity;
 import simulation.map.MapCell;
+import java.util.HashMap;
+import java.util.Map;
 
+/**
+ * the command allows the TerraBot to enhance the environmental
+ * conditions of the current map cell
+ */
 public final class ImproveEnvironment implements Command {
 
     private static final String ERR_NOT_STARTED =
@@ -21,7 +27,7 @@ public final class ImproveEnvironment implements Command {
     private static final String ERR_UNKNOWN_TYPE =
             "ERROR: Unknown improvement type.";
     private static final String ERR_MISSING_ENTITY =
-            "ERROR: Cannot improve environment here (missing soil/air).";
+            "ERROR: Cannot improve environment here.";
 
     private static final int ENERGY_COST = 10;
     private static final double PLANT_OXYGEN_INCREASE = 0.3;
@@ -31,12 +37,34 @@ public final class ImproveEnvironment implements Command {
     private static final double PRECISION_FACTOR = 100.0;
     private static final double MIN_ENERGY_REQUIRED = 10;
 
+    /**
+     * the abstract base class for all environmental improvement strategies
+     */
     private abstract static class Improvement {
+        /**
+         * retrieves the required fact string associated with the improvement action
+         * @param name the name of the entity being used as an ingredient
+         * @return the required fact string
+         */
         abstract String getFact(String name);
+        /**
+         * retrieves the success message for the improvement action
+         * @param name the name of the entity used
+         * @return the success message string
+         */
         abstract String getMsg(String name);
+        /**
+         * applies the specific environmental change to the current cell modifying
+         * the air or soil properties
+         * @param cell the map cell where the action is performed
+         * @return true if the necessary target entity was present and modified
+         */
         abstract boolean apply(MapCell cell);
     }
 
+    /**
+     * concrete strategy for planting vegetation - increasing air oxygen level
+     */
     private static final class Planting extends Improvement {
         @Override
         String getFact(final String name) {
@@ -60,6 +88,9 @@ public final class ImproveEnvironment implements Command {
         }
     }
 
+    /**
+     * concrete strategy for fertilizing soil - increasing organic matter
+     */
     private static final class Fertilizing extends Improvement {
         @Override
         String getFact(final String name) {
@@ -83,6 +114,9 @@ public final class ImproveEnvironment implements Command {
         }
     }
 
+    /**
+     * concrete strategy for increasing humidity - modifying air humidity
+     */
     private static final class Humidifying extends Improvement {
         @Override
         String getFact(final String name) {
@@ -90,7 +124,7 @@ public final class ImproveEnvironment implements Command {
         }
 
         @Override
-        String getMsg(final String name) { // FIX: Parameter final
+        String getMsg(final String name) {
             return "The humidity was successfully increased using " + name + ".";
         }
 
@@ -106,14 +140,17 @@ public final class ImproveEnvironment implements Command {
         }
     }
 
+    /**
+     * concrete strategy for moistening soil - increasing water retention
+     */
     private static final class Moistening extends Improvement {
         @Override
         String getFact(final String name) {
-            return "Method to increase moisture with " + name;
+            return "Method to increaseMoisture";
         }
 
         @Override
-        String getMsg(final String name) { // FIX: Parameter final
+        String getMsg(final String name) {
             return "The moisture was successfully increased using " + name + ".";
         }
 
@@ -129,6 +166,24 @@ public final class ImproveEnvironment implements Command {
         }
     }
 
+    /**
+     * static map holding instances of the concrete improvement strategies
+     */
+    private static final Map<String, Improvement> IMPROVEMENT_REGISTRY = new HashMap<>();
+
+    static {
+        IMPROVEMENT_REGISTRY.put("plantVegetation", new Planting());
+        IMPROVEMENT_REGISTRY.put("fertilizeSoil", new Fertilizing());
+        IMPROVEMENT_REGISTRY.put("increaseHumidity", new Humidifying());
+        IMPROVEMENT_REGISTRY.put("increaseMoisture", new Moistening());
+    }
+
+    /**
+     * executes the environment improvement command
+     * it verifies preconditions (energy, knowledge, inventory)
+     * selects the appropriate
+     * @param ctx the context object containing the simulation state
+     */
     @Override
     public void execute(final CommanContext ctx) {
         ObjectNode result = ctx.getResultNode();
@@ -152,24 +207,12 @@ public final class ImproveEnvironment implements Command {
         }
 
         String type = input.getImprovementType();
-        Improvement act = null;
 
-        switch (type) {
-            case "plantVegetation":
-                act = new Planting();
-                break;
-            case "fertilizeSoil":
-                act = new Fertilizing();
-                break;
-            case "increaseHumidity":
-                act = new Humidifying();
-                break;
-            case "increaseMoisture":
-                act = new Moistening();
-                break;
-            default:
-                result.put("message", ERR_UNKNOWN_TYPE);
-                return;
+        Improvement act = IMPROVEMENT_REGISTRY.get(type);
+
+        if (act == null) {
+            result.put("message", ERR_UNKNOWN_TYPE);
+            return;
         }
 
         String entityName = input.getName();
@@ -192,7 +235,6 @@ public final class ImproveEnvironment implements Command {
         }
 
         MapCell currentCell = ctx.getSimulation().getMap().getCell(robot.getPosition());
-
         boolean success = act.apply(currentCell);
 
         if (success) {

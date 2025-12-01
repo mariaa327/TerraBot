@@ -50,6 +50,16 @@ public final class PrintMap implements Command {
         result.set("output", outArray);
     }
 
+    /**
+     * creates the JSON node for a single cell using polymorphism to retrieve
+     * the quality categories
+     * @param cell the map cell
+     * @param x the x-coordinate
+     * @param y the y-coordinate
+     * @param mapper Jackson ObjectMapper
+     * @param currentTimestamp the current timestamp
+     * @return the JSON node containing the cell data
+     */
     private ObjectNode createCellNodeData(final MapCell cell, final int x, final int y,
                                           final ObjectMapper mapper, final int currentTimestamp) {
 
@@ -65,22 +75,17 @@ public final class PrintMap implements Command {
         Air air = cell.getAir();
         Soil soil = cell.getSoil();
 
-        String airQuality;
         if (air != null) {
-            airQuality = air.getQualityCategory(currentTimestamp);
+            air.putQualityStatus(cellNode, currentTimestamp);
         } else {
-            airQuality = DEFAULT_QUALITY_POOR;
+            cellNode.put("airQuality", DEFAULT_QUALITY_POOR);
         }
 
-        String soilQuality;
         if (soil != null) {
-            soilQuality = soil.getQualityCategory();
+            soil.putQualityStatus(cellNode);
         } else {
-            soilQuality = DEFAULT_QUALITY_POOR;
+            cellNode.put("soilQuality", DEFAULT_QUALITY_POOR);
         }
-
-        cellNode.put("airQuality", airQuality);
-        cellNode.put("soilQuality", soilQuality);
 
         return cellNode;
     }

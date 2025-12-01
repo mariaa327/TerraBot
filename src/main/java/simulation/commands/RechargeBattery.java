@@ -4,6 +4,11 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import simulation.core.Simulation;
 import simulation.core.TerraBot;
 
+/**
+ * the command initiates a charging process for the TerraBot
+ * it consumes simulation time equal to the amount specified for charging during which
+ * the simulation updates occur without robot movement
+ */
 public final class RechargeBattery implements Command {
 
     private static final String ERR_NOT_STARTED =
@@ -11,6 +16,13 @@ public final class RechargeBattery implements Command {
     private static final String ERR_STILL_CHARGING =
             "ERROR: Robot still charging. Cannot perform action";
 
+    /**
+     * executes the recharge command
+     * checks simulation status and robot charging status
+     * initiates the charging sequence updating the simulation for the duration specified
+     * @param ctx the context object containing the simulation state
+     * @return void for errors
+     */
     @Override
     public void execute(final CommanContext ctx) {
         ObjectNode result = ctx.getResultNode();

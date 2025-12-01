@@ -4,6 +4,12 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import fileio.CommandInput;
 import simulation.core.TerraBot;
 
+/**
+ * the command enables the TerraBot to store a new fact
+ * about an entity that has been previously scanned
+ * it consumes a small amount of energy and records the fact in the robot's database
+ * provided the subject entity has already been identified and saved
+ */
 public final class LearnFact implements Command {
 
     private static final String ERR_NOT_STARTED =
@@ -17,6 +23,13 @@ public final class LearnFact implements Command {
     private static final String SUCCESS_MSG =
             "The fact has been successfully saved in the database.";
 
+    /**
+     * executes the learn fact command
+     * it verifies the simulation status, robot energy level
+     * and confirms that the subject entity has been previously scanned before saving the fact
+     * @param ctx the context object containing the simulation state
+     * @return void for errors
+     */
     @Override
     public void execute(final CommanContext ctx) {
         ObjectNode result = ctx.getResultNode();

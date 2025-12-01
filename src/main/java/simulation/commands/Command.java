@@ -2,7 +2,7 @@ package simulation.commands;
 
 public interface Command {
     /**
-     * @param ctx contextul comenzii - starea simularii si obiectele necesare
+     * @param ctx command context - simulation state and necessary objects
      */
     void execute(CommanContext ctx);
 }

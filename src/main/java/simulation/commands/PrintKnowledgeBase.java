@@ -7,11 +7,22 @@ import simulation.core.TerraBot;
 
 import java.util.List;
 
+/**
+ * the command retrieves and serializes all knowledge stored in the TerraBot's database
+ * it outputs the knowledge base as a list of topics, each containing an array of associated facts
+ */
 public final class PrintKnowledgeBase implements Command {
 
     private static final String ERR_NOT_STARTED =
             "ERROR: Simulation not started. Cannot perform action";
 
+    /**
+     * executes the print knowledge base command
+     * it checks if the simulation is started retrieves the TerraBot's knowledge base
+     * and converts the stored information into a JSON array structure for output
+     * @param ctx the context object containing the simulation state
+     * @return void for errors
+     */
     @Override
     public void execute(final CommanContext ctx) {
         ObjectNode result = ctx.getResultNode();
